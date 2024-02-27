@@ -1,0 +1,35 @@
+version: '3'
+services:
+    
+  mysql:
+    image: mysql:5.7.33
+    environment:
+      - MYSQL_DATABASE=nest-service-example-db
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_TCP_PORT=3307
+    ports:
+      - 3307:3307
+      - 9228:9228
+    volumes:
+      - mysqlvolume:/var/lib/mysql
+
+  nest-service-example:
+    build: .
+    ports:
+      - 3000:3000
+    depends_on:
+      - mysql
+    volumes:
+      - ./src/:/app/src
+      - ./package.json:/app/package.json
+    environment:
+      - PORT=3000
+      - DB_NAME=nest-service-example-db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - DB_PORT=3307
+    command: npm run start:dev       
+      
+volumes:
+  mysqlvolume:
+    driver: local          
