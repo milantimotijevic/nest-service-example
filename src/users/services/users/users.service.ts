@@ -1,45 +1,54 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User } from '../../utils/types';
+import { UserCredentialsParams, UserParams, UserProfileParams } from '../../utils/types';
 import { CreateUserDto } from '../../dtos/CreateUserDto';
 import { CreateUserProfileDto } from '../../dtos/CreateUserProfileDto';
 import { CreateUserCredentialsDto } from '../../dtos/CreateUserCredentialsDto';
 import * as crypto from 'crypto';
-
-const users: User[] = [];
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../../../typeorm/entities/User';
+import { Repository } from 'typeorm';
+import { UserProfile } from '../../../typeorm/entities/UserProfile';
+import { UserCredentials } from '../../../typeorm/entities/UserCredentials';
 
 @Injectable()
 export class UsersService {
 
+    constructor(
+        @InjectRepository(User) private usersRepository: Repository<User>,
+        @InjectRepository(UserProfile) private userProfilesRepository: Repository<UserProfile>,
+        @InjectRepository(UserCredentials) private userCredentialsRepository: Repository<UserCredentials>,
+    ) { }
+
     async getAllUsers() {
-        return users;
+        return this.usersRepository.find({ relations: ['profile', 'credentials'] });
     }
 
     async getUserById(id: number) {
-        const user = users[id];
+        return this.usersRepository.findOne({ where: { id }, relations: ['profile', 'credentials'] });
+    }
+
+    async createUser(userParams: UserParams) {
+        const newUser = this.usersRepository.create({
+            ...userParams,
+            createdAt: new Date(),
+        });
+
+        return this.usersRepository.save(newUser);
+    }
+
+    async createUserProfile(id: number, userProfileParams: UserProfileParams) {
+        const user = await this.getUserById(id);
 
         if (!user) {
             throw new HttpException(`User with id ${id} not found`, HttpStatus.NOT_FOUND);
         }
-        
-        return user;
-    }
 
-    async createUser(createUserDto: CreateUserDto) {
-        const user = { ... createUserDto, profile: null, credentials: null };
-        users.push(user);
-        return user;
-    }
+        const newProfile = this.userProfilesRepository.create(userProfileParams);
+        const savedProfile = await this.userProfilesRepository.save(newProfile);
 
-    createUserProfile(id: number, createUserProfileDto: CreateUserProfileDto) {
-        const user = users[id];
+        user.profile = savedProfile;
 
-        if (!user) {
-            throw new HttpException(`User with id ${id} not found`, HttpStatus.NOT_FOUND);
-        }
-
-        user.profile = createUserProfileDto;
-
-        return user;
+        return this.usersRepository.save(user);
     }
 
     private createSalt(length: number) {
@@ -48,33 +57,27 @@ export class UsersService {
 
     private hashPassword(password: string, salt: string): string {
         const hash = crypto.createHash('sha256');
-        hash.update(password + salt); // Combine password and salt
-        return hash.digest('hex'); // Convert hash to hexadecimal string
+        hash.update(password + salt);
+        return hash.digest('hex');
     }
 
-    createUserCredentials(id: number, createUserCredentialsDto: CreateUserCredentialsDto) {
-        const user = users[id];
+    async createUserCredentials(id: number, password: string) {
+        const user = await this.getUserById(id);
 
         if (!user) {
             throw new HttpException(`User with id ${id} not found`, HttpStatus.NOT_FOUND);
         }
 
-        const { password, confirmPassword } = createUserCredentialsDto;
-
-        if (!password || !confirmPassword || password !== confirmPassword) {
-            throw new HttpException('Pasword and confirmPassword fields must match', HttpStatus.BAD_REQUEST);
-        }
-
         const salt = this.createSalt(20);
-        const hashedPassword = this.hashPassword(password, salt);
 
-        user.credentials = {
+        const newCredentials = this.userCredentialsRepository.create({
             salt,
-            password: hashedPassword,
-        }
+            password: this.hashPassword(password, salt),
+        });
 
-        const { credentials, ...userData } = user;
+        const savedCredentials = await this.userCredentialsRepository.save(newCredentials);
+        user.credentials = savedCredentials;
 
-        return userData;
+        return this.usersRepository.save(user);
     }
 }

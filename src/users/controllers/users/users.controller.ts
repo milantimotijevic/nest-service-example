@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from '../../services/users/users.service';
 import { CreateUserDto } from '../../dtos/CreateUserDto';
 import { CreateUserProfileDto } from '../../dtos/CreateUserProfileDto';
@@ -22,20 +22,29 @@ export class UsersController {
     @HttpCode(200)
     @UsePipes(ValidationPipe)
     async createUser(@Body() createUserDto: CreateUserDto) {
-        return this.userService.createUser(createUserDto);
+        return this.userService.createUser({
+            email: createUserDto.email,
+            profile: null,
+            credentials: null,
+        });
     }
 
     @Post(':id/profiles')
     @HttpCode(200)
     @UsePipes(ValidationPipe)
     async createUserProfile(@Param('id', ParseIntPipe) id: number, @Body() createUserProfileDto: CreateUserProfileDto) {
-        return this.userService.createUserProfile(id, createUserProfileDto);
+        return this.userService.createUserProfile(id, {...createUserProfileDto});
     }
 
     @Post(':id/credentials')
     @HttpCode(200)
     @UsePipes(ValidationPipe)
     async createUserCredentials(@Param('id', ParseIntPipe) id: number, @Body() createUserCredentialsDto: CreateUserCredentialsDto) {
-        return this.userService.createUserCredentials(id, createUserCredentialsDto);
+        const { password, confirmPassword } = createUserCredentialsDto;
+
+        if (!password || !confirmPassword || password !== confirmPassword) {
+            throw new HttpException('Pasword and confirmPassword fields must match', HttpStatus.BAD_REQUEST);
+        }
+        return this.userService.createUserCredentials(id, password);
     }
 }
