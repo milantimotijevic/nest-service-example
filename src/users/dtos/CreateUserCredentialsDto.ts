@@ -1,6 +1,6 @@
-import { IsEmail, IsNotEmpty, Matches } from 'class-validator'
+import { Matches } from 'class-validator'
 
-export class CreateUserSecurityInfoDto {
+export class CreateUserCredentialsDto {
     @Matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, {
         message: 'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one digit.',
     })

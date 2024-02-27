@@ -1,6 +1,8 @@
 
 export type User = {
     email: string,
+    profile: UserProfile,
+    credentials: UserCredentials,
 };
 
 export type UserProfile = {
@@ -9,7 +11,7 @@ export type UserProfile = {
     age: number,
 };
 
-export type UserSecurityInfo = {
+export type UserCredentials = {
     salt: string,
     password: string,
 }
