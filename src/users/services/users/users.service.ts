@@ -14,8 +14,14 @@ export class UsersService {
         return users;
     }
 
-    async getUserById(id: string) {
-        return users[id];
+    async getUserById(id: number) {
+        const user = users[id];
+
+        if (!user) {
+            throw new HttpException(`User with id ${id} not found`, HttpStatus.NOT_FOUND);
+        }
+        
+        return user;
     }
 
     async createUser(createUserDto: CreateUserDto) {
@@ -24,7 +30,7 @@ export class UsersService {
         return user;
     }
 
-    createUserProfile(id: string, createUserProfileDto: CreateUserProfileDto) {
+    createUserProfile(id: number, createUserProfileDto: CreateUserProfileDto) {
         const user = users[id];
 
         if (!user) {
@@ -46,7 +52,7 @@ export class UsersService {
         return hash.digest('hex'); // Convert hash to hexadecimal string
     }
 
-    createUserCredentials(id: string, createUserCredentialsDto: CreateUserCredentialsDto) {
+    createUserCredentials(id: number, createUserCredentialsDto: CreateUserCredentialsDto) {
         const user = users[id];
 
         if (!user) {
