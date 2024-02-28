@@ -3,7 +3,6 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './typeorm/entities/User';
 import { UserProfile } from './typeorm/entities/UserProfile';
-import { UserCredentials } from './typeorm/entities/UserCredentials';
 import { ReservationsModule } from './reservations/reservations.module';
 
 const {
@@ -22,7 +21,7 @@ const {
     password: DB_PASSWORD,
     port: parseInt(DB_PORT),
     host: DB_HOST,
-    entities: [User, UserProfile, UserCredentials],
+    entities: [User, UserProfile],
     synchronize: true,
   }), UsersModule, ReservationsModule],
   controllers: [],

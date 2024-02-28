@@ -1,17 +1,13 @@
 
-export type UserParams = {
+export type UserType = {
     email: string,
-    profile: UserProfileParams,
-    credentials: UserCredentialsParams,
+    salt: string,
+    password: string,
+    profile: UserProfileType,
 };
 
-export type UserProfileParams = {
+export type UserProfileType = {
     firstName: string,
     lastName: string,
     age: number,
 };
-
-export type UserCredentialsParams = {
-    salt: string,
-    password: string,
-}
