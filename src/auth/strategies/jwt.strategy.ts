@@ -15,10 +15,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        // this will be available under req.user for all endpoints using this strategy (guard)
+        /*
+        this will be available under req.user for all endpoints using this strategy
+        regardless of whether it's called through our custom guard or AuthGuard('jwt')
+        */
         return {
             ...payload,
-            andCats: true, // example of "extra logic". otherwise, just return the payload, or use AuthGuard('jwt')
+            andCats: true,
         };
     }
 }
