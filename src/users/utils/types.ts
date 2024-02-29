@@ -1,6 +1,6 @@
 
 export type UserType = {
-    email: string,
+    username: string,
     salt: string,
     password: string,
     profile: UserProfileType,

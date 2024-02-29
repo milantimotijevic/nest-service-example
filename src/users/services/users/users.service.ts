@@ -23,6 +23,10 @@ export class UsersService {
         return this.usersRepository.findOne({ where: { id }, relations: ['profile'] });
     }
 
+    async getUserUsername(username: string) {
+        return this.usersRepository.findOne({ where: { username } });
+    }
+
     async createUser(userParams: UserType) {
         const salt = createSalt(20);
 
