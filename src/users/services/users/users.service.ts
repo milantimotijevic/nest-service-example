@@ -23,7 +23,7 @@ export class UsersService {
         return this.usersRepository.findOne({ where: { id }, relations: ['profile'] });
     }
 
-    async getUserUsername(username: string) {
+    async getUserByUsername(username: string) {
         return this.usersRepository.findOne({ where: { username } });
     }
 

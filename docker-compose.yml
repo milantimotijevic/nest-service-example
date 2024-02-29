@@ -29,6 +29,7 @@ services:
       - DB_PASSWORD=root
       - DB_PORT=3306
       - DB_HOST=mysql
+      - SECRET=SECRET
     command: npm run start:dev       
       
 volumes:

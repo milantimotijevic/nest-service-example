@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './typeorm/entities/User';
 import { UserProfile } from './typeorm/entities/UserProfile';
 import { ReservationsModule } from './reservations/reservations.module';
+import { AuthModule } from './auth/auth.module';
 
 const {
   DB_NAME,
@@ -23,7 +24,7 @@ const {
     host: DB_HOST,
     entities: [User, UserProfile],
     synchronize: true,
-  }), UsersModule, ReservationsModule],
+  }), UsersModule, ReservationsModule, AuthModule],
   controllers: [],
   providers: [],
 })
