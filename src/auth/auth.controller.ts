@@ -15,6 +15,7 @@ export class AuthController {
     }
 
     @Get('status')
+    //@UseGuards(AuthGuard('jwt')) // stick with this one if you don't custom logic
     @UseGuards(JwtAuthGuard)
     getStatus(@Req() req: Request) {
         return req.user;
