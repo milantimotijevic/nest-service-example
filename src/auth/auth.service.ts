@@ -31,13 +31,13 @@ export class AuthService {
         const user = await this.usersService.getUserByUsername(username);
 
         if (!user || !user.password || !user.salt) {
-            throw new UnauthorizedException();
+            return false;
         }
 
         const hashedPassword = hashPassword(password, user.salt);
 
         if (user.password !== hashedPassword) {
-            throw new UnauthorizedException();
+            throw false;
         }
         const {
             password: passwordFromDb,

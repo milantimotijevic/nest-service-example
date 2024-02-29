@@ -7,11 +7,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserProfile } from '../typeorm/entities/UserProfile';
 import { User } from '../typeorm/entities/User';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 const { SECRET } = process.env;
 
 @Module({
     imports: [
+        PassportModule,
         TypeOrmModule.forFeature([User, UserProfile]),
         JwtModule.register({
             secret: SECRET,
@@ -19,7 +23,7 @@ const { SECRET } = process.env;
         })
     ],
     controllers: [AuthController],
-    providers: [AuthService, UsersService]
+    providers: [AuthService, UsersService, LocalStrategy, JwtStrategy]
 })
 
 export class AuthModule { }

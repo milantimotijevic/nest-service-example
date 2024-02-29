@@ -1,13 +1,22 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { AuthPayloadDto } from './dtos/auth.dto';
-import { AuthService } from './auth.service';
+import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { LocalGuard } from './guards/local.guard';
+import { Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) { }
 
     @Post('login')
-    login(@Body() authPayload: AuthPayloadDto) {
-        return this.authService.validateUser(authPayload);
+    //@UseGuards(AuthGuard('local')) // stick with this one if you don't custom logic
+    @UseGuards(LocalGuard)
+    async login(@Req() req: Request) {
+        return req.user;
+    }
+
+    @Get('status')
+    @UseGuards(JwtAuthGuard)
+    getStatus(@Req() req: Request) {
+        return req.user;
     }
 }
