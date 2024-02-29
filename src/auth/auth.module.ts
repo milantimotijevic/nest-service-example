@@ -23,6 +23,7 @@ const { SECRET } = process.env;
         })
     ],
     controllers: [AuthController],
+    // LocalStrategy and JwtStrategy are imported here, which means they can be used in guards
     providers: [AuthService, UsersService, LocalStrategy, JwtStrategy]
 })
 
